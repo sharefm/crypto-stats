@@ -33,13 +33,14 @@ export function useBinanceWebSocket() {
         wsRefsRef.current[pair] = ws;
 
         ws.onopen = () => {
-          console.log(`WebSocket connected for ${pair}`);
+          console.log(`✅ WebSocket connected for ${pair}`);
           connectionCountRef.current += 1;
 
           // If all connections are established
           if (connectionCountRef.current === PAIRS.length) {
             setConnected(true);
             setError(null);
+            console.log(`✅ All ${PAIRS.length} WebSocket connections established`);
           }
         };
 
@@ -52,6 +53,12 @@ export function useBinanceWebSocket() {
             const bidPrice = parseFloat(tickerData.b);     // Best bid
             const askPrice = parseFloat(tickerData.a);     // Best ask
             const volume = parseFloat(tickerData.v);       // Volume
+
+            // Validate data - skip if any critical value is NaN
+            if (isNaN(currentPrice) || currentPrice === 0 || isNaN(bidPrice) || isNaN(askPrice)) {
+              console.warn(`Invalid data for ${pair}:`, tickerData);
+              return;
+            }
 
             setData(prevData => {
               const currentPairData = prevData[pair] || {
@@ -69,10 +76,10 @@ export function useBinanceWebSocket() {
                 price: currentPrice,
                 bidPrice: bidPrice,
                 askPrice: askPrice,
-                volume: volume,
-                priceChangePercent: parseFloat(tickerData.P),
-                high24h: parseFloat(tickerData.h),
-                low24h: parseFloat(tickerData.l),
+                volume: volume || 0,
+                priceChangePercent: parseFloat(tickerData.P) || 0,
+                high24h: parseFloat(tickerData.h) || 0,
+                low24h: parseFloat(tickerData.l) || 0,
                 lastUpdate: Date.now()
               };
 
