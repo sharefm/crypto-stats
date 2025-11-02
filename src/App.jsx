@@ -14,14 +14,14 @@ function App() {
   const [calculations, setCalculations] = useState({});
   const [lastUpdate, setLastUpdate] = useState(null);
 
-  // Recalculate all metrics every 5 seconds
+  // Recalculate all metrics every 2 seconds
   useEffect(() => {
     const calculateMetrics = () => {
       const newCalculations = {};
 
       pairs.forEach(pair => {
         const pairData = data[pair];
-        if (!pairData) return;
+        if (!pairData || !pairData.price) return;
 
         const priceHistory = getPriceHistory(pair);
         const { price, bidPrice, askPrice, volume } = pairData;
@@ -36,8 +36,10 @@ function App() {
         };
       });
 
-      setCalculations(newCalculations);
-      setLastUpdate(new Date().toLocaleTimeString());
+      if (Object.keys(newCalculations).length > 0) {
+        setCalculations(newCalculations);
+        setLastUpdate(new Date().toLocaleTimeString());
+      }
     };
 
     // Set up interval for recalculation every 2 seconds
