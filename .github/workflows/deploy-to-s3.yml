@@ -38,4 +38,4 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync dist/ s3://www.plug.ps/crypto --delete
+          aws s3 sync dist/ s3://www.plug.ps/crypto
